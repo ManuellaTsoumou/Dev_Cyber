@@ -1,0 +1,40 @@
+
+// cherker si on a envoyé qlq chose
+if (!isset($_POST['email'])) {
+    die(); 
+}
+if (!isset($_POST['password'])) {
+    die(); 
+}
+ $success = false;
+// On récupère les données du formulaire
+
+$email = $_POST ['email'];
+$password = $_POST ['password'];
+
+$pepper = 'regis';
+$password = $password . $pepper;
+// On hash le mot de passe en md5
+$password = $salt . $password . $pepper; 
+$hashPassword = md5($password);
+
+// On enregistre en base de données
+$conn = new PDO('mysql:host=localhost;dbname=regis', 'regis', 'regis');
+$stmt = $conn->prepare('INSERT INTO regis.users(email, hash_password) VALUES (?, ?)');
+
+try {
+    $stmt->execute([$email, $hashPassword]);
+    $success = true;
+} catch (Exception $e) {
+    $success = false;
+}
+
+//Donner une page de succès ou une page d'échec 
+if ($success === true) {
+    include 'success.html';
+} else {
+    include 'faillure.html';
+}
+
+die(); //
+
